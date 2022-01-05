@@ -24,7 +24,8 @@ func (s *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
 		return err
 	}
 
-	q := New(tx)
+	//q := New(tx)
+	q := s.Queries.WithTx(tx)
 	err = fn(q)
 	if err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
@@ -52,9 +53,10 @@ type TransferTxResult struct {
 func (s *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
 	var result TransferTxResult
 
-	err := s.execTx(ctx, func(q *Queries) error {
+	err := s.execTx(ctx, func(qtx *Queries) error {
 		var err error
-		result.Transfer, err = q.CreateTransfer(ctx, CreateTransferParams{
+
+		result.Transfer, err = qtx.CreateTransfer(ctx, CreateTransferParams{
 			FromAccountID: arg.FromAccountID,
 			ToAccountID:   arg.ToAccountID,
 			Amount:        arg.Amount,
@@ -63,7 +65,7 @@ func (s *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferT
 			return err
 		}
 
-		result.FromEntry, err = q.CreateEntry(ctx, CreateEntryParams{
+		result.FromEntry, err = qtx.CreateEntry(ctx, CreateEntryParams{
 			AccountID: arg.FromAccountID,
 			Amount:    -arg.Amount,
 		})
@@ -71,7 +73,7 @@ func (s *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferT
 			return err
 		}
 
-		result.ToEntry, err = q.CreateEntry(ctx, CreateEntryParams{
+		result.ToEntry, err = qtx.CreateEntry(ctx, CreateEntryParams{
 			AccountID: arg.ToAccountID,
 			Amount:    arg.Amount,
 		})
@@ -79,7 +81,21 @@ func (s *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferT
 			return err
 		}
 
-		// TODO: update account's balance
+		result.FromAccount, err = qtx.AddAccountBalance(ctx, AddAccountBalanceParams{
+			ID:     arg.FromAccountID,
+			Amount: -arg.Amount,
+		})
+		if err != nil {
+			return err
+		}
+
+		result.ToAccount, err = qtx.AddAccountBalance(ctx, AddAccountBalanceParams{
+			ID:     arg.ToAccountID,
+			Amount: arg.Amount,
+		})
+		if err != nil {
+			return err
+		}
 
 		return nil
 	})
