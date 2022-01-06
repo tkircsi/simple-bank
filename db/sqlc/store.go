@@ -56,11 +56,12 @@ func (s *Store) TransferTx(ctx context.Context, arg TransferTxParams) (TransferT
 	err := s.execTx(ctx, func(qtx *Queries) error {
 		var err error
 
-		result.Transfer, err = qtx.CreateTransfer(ctx, CreateTransferParams{
-			FromAccountID: arg.FromAccountID,
-			ToAccountID:   arg.ToAccountID,
-			Amount:        arg.Amount,
-		})
+		// result.Transfer, err = qtx.CreateTransfer(ctx, CreateTransferParams{
+		// 	FromAccountID: arg.FromAccountID,
+		// 	ToAccountID:   arg.ToAccountID,
+		// 	Amount:        arg.Amount,
+		// })
+		result.Transfer, err = qtx.CreateTransfer(ctx, CreateTransferParams(arg))
 		if err != nil {
 			return err
 		}
