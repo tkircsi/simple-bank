@@ -45,10 +45,10 @@ func GenerateRandomString(n int) string {
 func RandomUser() []string {
 	rec := <-userStream
 	fullName := rec[0]
-	hashedPassword := GenerateRandomString(10)
-	userName := strings.ToLower(strings.ReplaceAll(fullName, " ", "."))
+	password := GenerateRandomString(10)
+	userName := strings.ToLower(strings.ReplaceAll(fullName, " ", ""))
 	email := fmt.Sprintf("%s@simplemail.com", userName)
-	return []string{userName, fullName, email, hashedPassword}
+	return []string{userName, fullName, email, password}
 
 }
 
