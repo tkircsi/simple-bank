@@ -12,8 +12,9 @@ import (
 )
 
 func createRandomAccount(t *testing.T) Account {
+	u := createRandomUser(t)
 	arg := CreateAccountParams{
-		Owner:    util.RandomOwner(),
+		Owner:    u.Username,
 		Balance:  util.RandomMoney(),
 		Currency: util.RandomCurrency(),
 	}
@@ -37,12 +38,22 @@ func deleteRandomAccount(t *testing.T, acc Account) {
 	require.NoError(t, err)
 }
 
-func TestCreateAccount(t *testing.T) {
+func TestCreateAndDeleteAccount(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	acc := createRandomAccount(t)
 	deleteRandomAccount(t, acc)
+
 }
 
 func TestGetAccount(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
 	// create account
 	account1 := createRandomAccount(t)
 
@@ -56,10 +67,14 @@ func TestGetAccount(t *testing.T) {
 	require.Equal(t, account1.Currency, account2.Currency)
 	require.WithinDuration(t, account1.CreatedAt, account2.CreatedAt, time.Second)
 
-	deleteRandomAccount(t, account1)
 }
 
 func TestUpdateAccount(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	account1 := createRandomAccount(t)
 
 	arg := UpdateAccountParams{
@@ -77,10 +92,14 @@ func TestUpdateAccount(t *testing.T) {
 	require.Equal(t, account1.Currency, account2.Currency)
 	require.WithinDuration(t, account1.CreatedAt, account2.CreatedAt, time.Second)
 
-	deleteRandomAccount(t, account1)
 }
 
 func TestDeleteAccount(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	account1 := createRandomAccount(t)
 
 	deleteRandomAccount(t, account1)
@@ -93,6 +112,10 @@ func TestDeleteAccount(t *testing.T) {
 }
 
 func TestListAccounts(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
 	// create 5 random account
 	var raccounts []Account
 	for i := 0; i < 10; i++ {
@@ -114,8 +137,4 @@ func TestListAccounts(t *testing.T) {
 		require.NotEmpty(t, acc)
 	}
 
-	// clean up and delete the random accounts
-	for _, acc := range raccounts {
-		deleteRandomAccount(t, acc)
-	}
 }

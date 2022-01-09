@@ -12,11 +12,16 @@ import (
 func TestTransferTx(t *testing.T) {
 	store := NewStore(testDB)
 
+	defer func() {
+		err := store.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	account1 := createRandomAccount(t)
 	account2 := createRandomAccount(t)
 	fmt.Printf(">>> before Account1: %d, Account2: %d\n", account1.Balance, account2.Balance)
 
-	n := 5
+	n := 10
 	amount := int64(10)
 
 	errs := make(chan error)
@@ -110,6 +115,11 @@ func TestTransferTx(t *testing.T) {
 func TestTransferTxDeadlock(t *testing.T) {
 	store := NewStore(testDB)
 
+	defer func() {
+		err := store.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	account1 := createRandomAccount(t)
 	account2 := createRandomAccount(t)
 	fmt.Printf(">>> before Account1: %d, Account2: %d\n", account1.Balance, account2.Balance)
@@ -154,5 +164,4 @@ func TestTransferTxDeadlock(t *testing.T) {
 	fmt.Printf(">>> after Account1: %d, Account2: %d\n", updatedAccount1.Balance, updatedAccount2.Balance)
 	require.Equal(t, account1.Balance, updatedAccount1.Balance)
 	require.Equal(t, account2.Balance, updatedAccount2.Balance)
-
 }

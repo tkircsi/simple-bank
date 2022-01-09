@@ -44,9 +44,12 @@ func TestSingleGetAccountAPI(t *testing.T) {
 }
 
 func randomAccount() db.Account {
+
+	user := util.RandomUser()
+
 	return db.Account{
 		ID:       util.RandomInt(1, 1000),
-		Owner:    util.RandomOwner(),
+		Owner:    user[0],
 		Balance:  util.RandomMoney(),
 		Currency: util.RandomCurrency(),
 	}

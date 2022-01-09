@@ -35,17 +35,23 @@ func deleteRandomTransfer(t *testing.T, transfer Transfer) {
 }
 
 func TestCreateTransfer(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	fromAccount := createRandomAccount(t)
 	toAccount := createRandomAccount(t)
-	transfer := createRandomTransfer(t, fromAccount, toAccount)
-
-	defer deleteRandomAccount(t, toAccount)
-	defer deleteRandomAccount(t, fromAccount)
-	defer deleteRandomTransfer(t, transfer)
+	_ = createRandomTransfer(t, fromAccount, toAccount)
 
 }
 
 func TestGetTransfer(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	fromAccount := createRandomAccount(t)
 	toAccount := createRandomAccount(t)
 	transfer1 := createRandomTransfer(t, fromAccount, toAccount)
@@ -60,12 +66,14 @@ func TestGetTransfer(t *testing.T) {
 	require.Equal(t, transfer1.Amount, transfer2.Amount)
 	require.WithinDuration(t, transfer1.CreatedAt, transfer2.CreatedAt, time.Second)
 
-	defer deleteRandomAccount(t, toAccount)
-	defer deleteRandomAccount(t, fromAccount)
-	defer deleteRandomTransfer(t, transfer1)
 }
 
 func TestUpdateTransfer(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	fromAccount := createRandomAccount(t)
 	toAccount := createRandomAccount(t)
 	transfer1 := createRandomTransfer(t, fromAccount, toAccount)
@@ -85,27 +93,29 @@ func TestUpdateTransfer(t *testing.T) {
 	require.Equal(t, arg.Amount, transfer2.Amount)
 	require.WithinDuration(t, transfer1.CreatedAt, transfer2.CreatedAt, time.Second)
 
-	defer deleteRandomAccount(t, toAccount)
-	defer deleteRandomAccount(t, fromAccount)
-	defer deleteRandomTransfer(t, transfer1)
 }
 
 func TestDeleteTransfer(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	fromAccount := createRandomAccount(t)
 	toAccount := createRandomAccount(t)
 	transfer := createRandomTransfer(t, fromAccount, toAccount)
 
-	defer deleteRandomAccount(t, toAccount)
-	defer deleteRandomAccount(t, fromAccount)
-	defer deleteRandomTransfer(t, transfer)
+	deleteRandomTransfer(t, transfer)
 }
 
 func TestListTransfers(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	fromAccount := createRandomAccount(t)
 	toAccount := createRandomAccount(t)
-
-	defer deleteRandomAccount(t, toAccount)
-	defer deleteRandomAccount(t, fromAccount)
 
 	var rtransfers []Transfer
 	for i := 0; i < 10; i++ {
@@ -126,7 +136,4 @@ func TestListTransfers(t *testing.T) {
 		require.NotEmpty(t, transfer)
 	}
 
-	for _, transfer := range rtransfers {
-		deleteRandomTransfer(t, transfer)
-	}
 }

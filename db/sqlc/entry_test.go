@@ -34,18 +34,23 @@ func deleteRandomEntry(t *testing.T, entry Entry) {
 }
 
 func TestCreateEntry(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	acc := createRandomAccount(t)
-	entry := createRandomEntry(t, acc)
-	deleteRandomEntry(t, entry)
-	deleteRandomAccount(t, acc)
+	_ = createRandomEntry(t, acc)
 }
 
 func TestGetEntry(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	acc := createRandomAccount(t)
 	entry1 := createRandomEntry(t, acc)
-
-	defer deleteRandomAccount(t, acc)
-	defer deleteRandomEntry(t, entry1)
 
 	entry2, err := testQueries.GetEntry(context.Background(), entry1.ID)
 	require.NoError(t, err)
@@ -59,11 +64,13 @@ func TestGetEntry(t *testing.T) {
 }
 
 func TestUpdateEntry(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	acc := createRandomAccount(t)
 	entry1 := createRandomEntry(t, acc)
-
-	defer deleteRandomAccount(t, acc)
-	defer deleteRandomEntry(t, entry1)
 
 	arg := UpdateEntryParams{
 		ID:     entry1.ID,
@@ -78,19 +85,26 @@ func TestUpdateEntry(t *testing.T) {
 	require.Equal(t, entry1.AccountID, entry2.AccountID)
 	require.Equal(t, arg.Amount, entry2.Amount)
 	require.WithinDuration(t, entry1.CreatedAt, entry2.CreatedAt, time.Second)
-
 }
 
 func TestDeleteEntry(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	acc := createRandomAccount(t)
 	entry1 := createRandomEntry(t, acc)
 	deleteRandomEntry(t, entry1)
-	deleteRandomAccount(t, acc)
 }
 
 func TestListEntries(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+
 	acc := createRandomAccount(t)
-	defer deleteRandomAccount(t, acc)
 
 	var rentries []Entry
 	for i := 0; i < 10; i++ {
@@ -109,10 +123,5 @@ func TestListEntries(t *testing.T) {
 
 	for _, entry := range entries {
 		require.NotEmpty(t, entry)
-	}
-
-	// clean up and delete the random accounts
-	for _, entry := range rentries {
-		deleteRandomEntry(t, entry)
 	}
 }
