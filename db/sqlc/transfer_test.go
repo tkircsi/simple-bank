@@ -117,9 +117,8 @@ func TestListTransfers(t *testing.T) {
 	fromAccount := createRandomAccount(t)
 	toAccount := createRandomAccount(t)
 
-	var rtransfers []Transfer
 	for i := 0; i < 10; i++ {
-		rtransfers = append(rtransfers, createRandomTransfer(t, fromAccount, toAccount))
+		createRandomTransfer(t, fromAccount, toAccount)
 	}
 
 	arg := ListTransfersParams{

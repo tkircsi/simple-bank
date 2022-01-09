@@ -106,9 +106,8 @@ func TestListEntries(t *testing.T) {
 
 	acc := createRandomAccount(t)
 
-	var rentries []Entry
 	for i := 0; i < 10; i++ {
-		rentries = append(rentries, createRandomEntry(t, acc))
+		createRandomEntry(t, acc)
 	}
 
 	arg := ListEntriesParams{

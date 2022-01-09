@@ -117,9 +117,8 @@ func TestListAccounts(t *testing.T) {
 		require.NoError(t, err)
 	}()
 	// create 5 random account
-	var raccounts []Account
 	for i := 0; i < 10; i++ {
-		raccounts = append(raccounts, createRandomAccount(t))
+		createRandomAccount(t)
 	}
 
 	arg := ListAccountsParams{

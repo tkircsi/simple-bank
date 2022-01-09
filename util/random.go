@@ -1,7 +1,6 @@
 package util
 
 import (
-	"crypto/sha256"
 	"encoding/csv"
 	"fmt"
 	"math/rand"
@@ -33,10 +32,20 @@ func RandomCurrency() string {
 	return curr[rand.Intn(len(curr))]
 }
 
+func GenerateRandomString(n int) string {
+	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
+	ret := make([]byte, n)
+	for i := 0; i < n; i++ {
+		num := rand.Int31n(int32(len(letters)))
+		ret[i] = letters[num]
+	}
+	return string(ret)
+}
+
 func RandomUser() []string {
 	rec := <-userStream
 	fullName := rec[0]
-	hashedPassword := fmt.Sprintf("%x", sha256.Sum256([]byte("password")))
+	hashedPassword := GenerateRandomString(10)
 	userName := strings.ToLower(strings.ReplaceAll(fullName, " ", "."))
 	email := fmt.Sprintf("%s@simplemail.com", userName)
 	return []string{userName, fullName, email, hashedPassword}

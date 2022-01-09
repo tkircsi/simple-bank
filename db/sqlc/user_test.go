@@ -130,9 +130,8 @@ func TestListUsers(t *testing.T) {
 		require.NoError(t, err)
 	}()
 
-	var rusers []User
 	for i := 0; i < 10; i++ {
-		rusers = append(rusers, createRandomUser(t))
+		createRandomUser(t)
 	}
 
 	arg := ListUsersParams{
