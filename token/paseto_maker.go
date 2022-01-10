@@ -9,17 +9,18 @@ import (
 )
 
 type PasetoMaker struct {
-	paseto       *pvx.ProtoV2Local
-	symmetricKey []byte
+	paseto       *pvx.ProtoV4Local
+	symmetricKey *pvx.SymKey
 }
 
-func NewPasetoMaker(simmetricKey string) (Maker, error) {
-	if len(simmetricKey) != chacha20poly1305.KeySize {
+func NewPasetoMaker(symmetricKey string) (Maker, error) {
+	if len(symmetricKey) != chacha20poly1305.KeySize {
 		return nil, fmt.Errorf("invalid key size: must be exactly %d", chacha20poly1305.KeySize)
 	}
+	symK := pvx.NewSymmetricKey([]byte(symmetricKey), pvx.Version4)
 	maker := &PasetoMaker{
-		paseto:       pvx.NewPV2Local(),
-		symmetricKey: []byte(simmetricKey),
+		paseto:       pvx.NewPV4Local(),
+		symmetricKey: symK,
 	}
 	return maker, nil
 }
@@ -30,7 +31,7 @@ func (m *PasetoMaker) CreateToken(username string, duration time.Duration) (stri
 		return "", err
 	}
 
-	return m.paseto.Encrypt(m.symmetricKey, payload, nil)
+	return m.paseto.Encrypt(m.symmetricKey, payload)
 }
 
 func (m *PasetoMaker) VerifyToken(token string) (*Payload, error) {
