@@ -137,3 +137,29 @@ func TestListAccounts(t *testing.T) {
 	}
 
 }
+
+func TestListAccountsByOwner(t *testing.T) {
+	defer func() {
+		err := testQueries.CleanUpDB(context.Background())
+		require.NoError(t, err)
+	}()
+	// create 5 random account
+	var lastAccount Account
+	for i := 0; i < 10; i++ {
+		lastAccount = createRandomAccount(t)
+	}
+
+	arg := ListAccountsByOwnerParams{
+		Owner:  lastAccount.Owner,
+		Limit:  5,
+		Offset: 0,
+	}
+	accounts, err := testQueries.ListAccountsByOwner(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, accounts)
+
+	for _, acc := range accounts {
+		require.NotEmpty(t, acc)
+		require.Equal(t, lastAccount.Owner, acc.Owner)
+	}
+}

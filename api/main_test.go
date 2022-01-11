@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"os"
 	"testing"
 	"time"
@@ -12,10 +13,11 @@ import (
 )
 
 func newTestServer(t *testing.T, store db.Store) *Server {
-	config := &util.Config{
-		TokenSymmetricKey:   util.GenerateRandomString(32),
-		AccessTokenDuration: time.Minute,
+	config, err := util.LoadConfig("..")
+	if err != nil {
+		log.Fatal("cannot read configuration:", err)
 	}
+	config.AccessTokenDuration = time.Minute
 
 	server, err := NewServer(config, store)
 	require.NoError(t, err)
