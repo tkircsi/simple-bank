@@ -50,6 +50,8 @@ func (s *Server) setupRouter() {
 	authRoutes.PUT("/accounts/:id", s.updateAccount)
 	authRoutes.POST("/transfers", s.createTransfer)
 
+	authRoutes.GET("accounts/admin", s.listAccount)
+
 	s.router = router
 }
 
