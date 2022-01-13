@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: simple-bank-cm
+data:
+  DB_DRIVER: "postgres"
+  SERVER_ADDRESS: "0.0.0.0:8080"
+  CURRENCY: "UR,HUF,USD"
+  ACCESS_TOKEN_DURATION: "15m"
+  GIN_MODE: "release"
